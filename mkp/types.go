@@ -277,3 +277,40 @@ func (ci *CircleInstances) GenerateInstance(r int, m int, d float64) ([]int, []i
 	}
 	return weights, profits
 }
+
+type SimilarBag struct {}
+
+func (sb *SimilarBag) GetName() string {
+	return "SimilarBag"
+}
+
+func (sb *SimilarBag) GenerateCapacity(weights []int, profits []int, n int) []int {
+	capacities := make([]int, 0)
+	instanceWeights := 0
+	for i := 0; i < len(weights); i++ {
+		instanceWeights += weights[i]
+	}
+	for i := 0; i < n; i++ {
+		capacities = append(capacities, RandInt(int(math.Ceil(0.4 * float64(instanceWeights / n))),int(math.Ceil(0.6 * float64(instanceWeights / n)))))
+	}
+	return capacities
+}
+
+type DiSimilarBag struct {}
+
+func (dsb *DiSimilarBag) GetName() string {
+	return "DiSimilarBag"
+}
+
+func (dsb *DiSimilarBag) GenerateCapacity(weights []int, profits []int, n int) []int {
+	capacities := make([]int, 0)
+	instanceWeights := 0
+	for i := 0; i < len(weights); i++ {
+		instanceWeights += weights[i]
+	}
+	for i := 0; i < len(weights); i++ {
+		capacities = append(capacities, RandInt(0, 0.5 * instanceWeights))
+		instanceWeights -= capacities[i]
+	}
+	return capacities
+}
