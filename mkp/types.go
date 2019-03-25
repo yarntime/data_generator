@@ -127,16 +127,96 @@ func (uiws *UncorrelatedInstancesWithSimilarWeights) GenerateInstance(r int, m i
 	return weights, profits
 }
 
-type SpannerInstances struct {}
+type UncorrelatedSpannerInstances struct {}
 
-func (si *SpannerInstances) GetName() string {
-	return "SpannerInstances"
+func (usi *UncorrelatedSpannerInstances) GetName() string {
+	return "UncorrelatedSpannerInstances"
 }
 
-func (si *SpannerInstances) GenerateInstance(r int, m int, v, mt int) ([]int, []int) {
+// we may choose v =2, m = 10 to generate the problems
+func (usi *UncorrelatedSpannerInstances) GenerateInstance(r int, m int, v, mt int) ([]int, []int) {
 	weights := make([]int, 0)
 	profits := make([]int, 0)
 
+	tmpWeights := make([]float64, 0)
+	tmpProfits := make([]float64, 0)
+	for i := 0; i < v; i++ {
+		tmpWeights = append(tmpWeights, float64(rnd.Intn(r) + 1) / float64(mt + 1))
+		tmpProfits = append(tmpProfits, float64(rnd.Intn(r) + 1) / float64(mt + 1))
+	}
+
+	choose := 0
+	for i := 0; i < m; i++ {
+		a := rnd.Intn(mt) + 1
+		weights = append(weights, int(math.Ceil(tmpWeights[choose] * float64(a))))
+		profits = append(profits, int(math.Ceil(tmpProfits[choose] * float64(a))))
+		choose++
+		if choose == v {
+			choose = 0
+		}
+	}
+	return weights, profits
+}
+
+type WeaklyCorrelatedSpannerInstances struct {}
+
+func (wcsi *WeaklyCorrelatedSpannerInstances) GetName() string {
+	return "WeaklyCorrelatedSpannerInstances"
+}
+
+// we may choose v =2, m = 10 to generate the problems
+func (wcsi *WeaklyCorrelatedSpannerInstances) GenerateInstance(r int, m int, v, mt int) ([]int, []int) {
+	weights := make([]int, 0)
+	profits := make([]int, 0)
+
+	tmpWeights := make([]float64, 0)
+	tmpProfits := make([]float64, 0)
+	for i := 0; i < v; i++ {
+		tmpWeights = append(tmpWeights, float64(rnd.Intn(r) + 1) / float64(mt + 1))
+		tmpProfits = append(tmpProfits, float64(RandInt(weights[i] - (r / 10), weights[i] + (r / 10))) / float64(mt + 1))
+	}
+
+	choose := 0
+	for i := 0; i < m; i++ {
+		a := rnd.Intn(mt) + 1
+		weights = append(weights, int(math.Ceil(tmpWeights[choose] * float64(a))))
+		profits = append(profits, int(math.Ceil(tmpProfits[choose] * float64(a))))
+		choose++
+		if choose == v {
+			choose = 0
+		}
+	}
+	return weights, profits
+}
+
+type StronglyCorrelatedSpannerInstances struct {}
+
+func (wcsi *StronglyCorrelatedSpannerInstances) GetName() string {
+	return "StronglyCorrelatedSpannerInstances"
+}
+
+// we may choose v =2, m = 10 to generate the problems
+func (wcsi *StronglyCorrelatedSpannerInstances) GenerateInstance(r int, m int, v, mt int) ([]int, []int) {
+	weights := make([]int, 0)
+	profits := make([]int, 0)
+
+	tmpWeights := make([]float64, 0)
+	tmpProfits := make([]float64, 0)
+	for i := 0; i < v; i++ {
+		tmpWeights = append(tmpWeights, float64(rnd.Intn(r) + 1) / float64(mt + 1))
+		tmpProfits = append(tmpProfits, float64(weights[i] + (r / 10)) / float64(mt + 1))
+	}
+
+	choose := 0
+	for i := 0; i < m; i++ {
+		a := rnd.Intn(mt) + 1
+		weights = append(weights, int(math.Ceil(tmpWeights[choose] * float64(a))))
+		profits = append(profits, int(math.Ceil(tmpProfits[choose] * float64(a))))
+		choose++
+		if choose == v {
+			choose = 0
+		}
+	}
 	return weights, profits
 }
 
