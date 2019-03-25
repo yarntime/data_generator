@@ -9,7 +9,7 @@ import (
 var rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func RandInt(min, max int) int {
-	if min >= max || min == 0 || max == 0 {
+	if min >= max {
 		return max
 	}
 	return rnd.Intn(max-min) + min
@@ -173,7 +173,7 @@ func (wcsi *WeaklyCorrelatedSpannerInstances) GenerateInstance(r int, m int, v, 
 	tmpProfits := make([]float64, 0)
 	for i := 0; i < v; i++ {
 		tmpWeights = append(tmpWeights, float64(rnd.Intn(r) + 1) / float64(mt + 1))
-		tmpProfits = append(tmpProfits, float64(RandInt(weights[i] - (r / 10), weights[i] + (r / 10))) / float64(mt + 1))
+		tmpProfits = append(tmpProfits, float64(RandInt(int(math.Ceil(tmpWeights[i])) - (r / 10), int(math.Ceil(tmpWeights[i])) + (r / 10))) / float64(mt + 1))
 	}
 
 	choose := 0
@@ -226,7 +226,7 @@ func (msci *MultipleStronglyCorrelatedInstances) GetName() string {
 	return "MultipleStronglyCorrelatedInstances"
 }
 
-// we may choose k1 = 3R / 10, k2 - 2R / 10, d = 6 to generate the most difficult problems
+// we may choose k1 = 3R / 10, k2 = 2R / 10, d = 6 to generate the most difficult problems
 func (msci *MultipleStronglyCorrelatedInstances) GenerateInstance(r int, m int, k1, k2, d int) ([]int, []int) {
 	weights := make([]int, 0)
 	profits := make([]int, 0)
@@ -308,8 +308,8 @@ func (dsb *DiSimilarBag) GenerateCapacity(weights []int, profits []int, n int) [
 	for i := 0; i < len(weights); i++ {
 		instanceWeights += weights[i]
 	}
-	for i := 0; i < len(weights); i++ {
-		capacities = append(capacities, RandInt(0, 0.5 * instanceWeights))
+	for i := 0; i < n; i++ {
+		capacities = append(capacities, RandInt(0, instanceWeights / 4))
 		instanceWeights -= capacities[i]
 	}
 	return capacities
