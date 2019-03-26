@@ -149,7 +149,6 @@ func writeToFile(path string, name string, weights []int, profits []int, capacit
 		w.WriteString(fmt.Sprintf("%d\n", capacities[i]))
 	}
 	w.Flush()
-	f.Close()
 }
 
 func PathExists(path string) (bool, error) {
