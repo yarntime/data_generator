@@ -8,10 +8,11 @@ import (
 )
 
 var normalInstances []mkp.InstanceType
+var difficultInstances = []string{"UncorrelatedSpannerInstances", "WeaklyCorrelatedSpannerInstances", "StronglyCorrelatedSpannerInstances",
+	"MultipleStronglyCorrelatedInstances", "ProfitCeilingInstances", "CircleInstances"}
 var normalBags      []mkp.BagType
 var R = []int{1000, 10000, 100000}
 var NMPair = [][]int{{50, 5}, {200, 20}}
-
 var BASE_DIR = "./generated_data/"
 
 func init() {
@@ -34,97 +35,55 @@ func main() {
 		for j := 0; j < len(NMPair); j++ {
 			for k := 0; k < len(normalInstances); k++ {
 				weights, profits := normalInstances[k].GenerateInstance(R[i], NMPair[j][0])
-				similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, NMPair[j][1])
+				similarCapacities := normalBags[0].GenerateCapacity(weights, profits, NMPair[j][1])
 				path, name := getFileName(R[i], NMPair[j][0], NMPair[j][1], normalInstances[k].GetName(), normalBags[0].GetName())
-				writeToFile(path, name, weights, profits, similarCapacitis)
+				writeToFile(path, name, weights, profits, similarCapacities)
 
-				disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, NMPair[j][1])
+				dissimilarCapacities := normalBags[1].GenerateCapacity(weights, profits, NMPair[j][1])
 				path, name = getFileName(R[i], NMPair[j][0], NMPair[j][1], normalInstances[k].GetName(), normalBags[1].GetName())
-				writeToFile(path, name, weights, profits, disimilarCapacity)
+				writeToFile(path, name, weights, profits, dissimilarCapacities)
 			}
 
-			getUncorrelatedSpannerInstances(R[i], NMPair[j][0], NMPair[j][1])
-			getWeaklyCorrelatedSpannerInstances(R[i], NMPair[j][0], NMPair[j][1])
-			getStronglyCorrelatedSpannerInstances(R[i], NMPair[j][0], NMPair[j][1])
-			getMultipleStronglyCorrelatedInstances(R[i], NMPair[j][0], NMPair[j][1])
-			getProfitCeilingInstances(R[i], NMPair[j][0], NMPair[j][1])
-			getCircleInstances(R[i], NMPair[j][0], NMPair[j][1])
+			for k := 0; k < len(difficultInstances); k++ {
+				weights, profits := getDifficultInstances(R[i], NMPair[j][0], NMPair[j][1], difficultInstances[k])
+
+				similarCapacities := normalBags[0].GenerateCapacity(weights, profits, NMPair[j][1])
+				path, name := getFileName(R[i], NMPair[j][0], NMPair[j][1], difficultInstances[k], normalBags[0].GetName())
+				writeToFile(path, name, weights, profits, similarCapacities)
+
+				dissimilarCapacities := normalBags[1].GenerateCapacity(weights, profits, NMPair[j][1])
+				path, name = getFileName(R[i], NMPair[j][0], NMPair[j][1], difficultInstances[k], normalBags[1].GetName())
+				writeToFile(path, name, weights, profits, dissimilarCapacities)
+			}
 		}
 	}
 }
 
-func getUncorrelatedSpannerInstances(r int, n int, m int) {
-	instanceType := &mkp.UncorrelatedSpannerInstances{}
-	weights, profits := instanceType.GenerateInstance(r, n, 2, 10)
-	similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, m)
-	path, name := getFileName(r, n, m, instanceType.GetName(), normalBags[0].GetName())
-	writeToFile(path, name, weights, profits, similarCapacitis)
-
-	disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, m)
-	path, name = getFileName(r, n, m, instanceType.GetName(), normalBags[1].GetName())
-	writeToFile(path, name, weights, profits, disimilarCapacity)
+func getDifficultInstances(r int, n int, m int, dateType string) ([]int, []int) {
+	var weights []int
+	var profits []int
+	switch dateType {
+	case "UncorrelatedSpannerInstances":
+		instanceType := &mkp.UncorrelatedSpannerInstances{}
+		weights, profits = instanceType.GenerateInstance(r, n, 2, 10)
+	case "WeaklyCorrelatedSpannerInstances":
+		instanceType := &mkp.WeaklyCorrelatedSpannerInstances{}
+		weights, profits = instanceType.GenerateInstance(r, n, 2, 10)
+	case "StronglyCorrelatedSpannerInstances":
+		instanceType := &mkp.WeaklyCorrelatedSpannerInstances{}
+		weights, profits = instanceType.GenerateInstance(r, n, 2, 10)
+	case "MultipleStronglyCorrelatedInstances":
+		instanceType := &mkp.MultipleStronglyCorrelatedInstances{}
+		weights, profits = instanceType.GenerateInstance(r, n, 3 * r / 10, 2 * r / 10, 6)
+	case "ProfitCeilingInstances":
+		instanceType := &mkp.ProfitCeilingInstances{}
+		weights, profits = instanceType.GenerateInstance(r, n, 3)
+	case "CircleInstances":
+		instanceType := &mkp.CircleInstances{}
+		weights, profits = instanceType.GenerateInstance(r, n, 2.0 / 3.0)
+	}
+	return weights, profits
 }
-
-func getWeaklyCorrelatedSpannerInstances(r int, n int, m int) {
-	instanceType := &mkp.WeaklyCorrelatedSpannerInstances{}
-	weights, profits := instanceType.GenerateInstance(r, n, 2, 10)
-	similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, m)
-	path, name := getFileName(r, n, m, instanceType.GetName(), normalBags[0].GetName())
-	writeToFile(path, name, weights, profits, similarCapacitis)
-
-	disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, m)
-	path, name = getFileName(r, n, m, instanceType.GetName(), normalBags[1].GetName())
-	writeToFile(path, name, weights, profits, disimilarCapacity)
-}
-
-func getStronglyCorrelatedSpannerInstances(r int, n int, m int) {
-	instanceType := &mkp.WeaklyCorrelatedSpannerInstances{}
-	weights, profits := instanceType.GenerateInstance(r, n, 2, 10)
-	similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, m)
-	path, name := getFileName(r, n, m, instanceType.GetName(), normalBags[0].GetName())
-	writeToFile(path, name, weights, profits, similarCapacitis)
-
-	disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, m)
-	path, name = getFileName(r, n, m, instanceType.GetName(), normalBags[1].GetName())
-	writeToFile(path, name, weights, profits, disimilarCapacity)
-}
-
-func getMultipleStronglyCorrelatedInstances(r int, n int, m int) {
-	instanceType := &mkp.MultipleStronglyCorrelatedInstances{}
-	weights, profits := instanceType.GenerateInstance(r, n, 3 * r / 10, 2 * r / 10, 6)
-	similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, m)
-	path, name := getFileName(r, n, m, instanceType.GetName(), normalBags[0].GetName())
-	writeToFile(path, name, weights, profits, similarCapacitis)
-
-	disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, m)
-	path, name = getFileName(r, n, m, instanceType.GetName(), normalBags[1].GetName())
-	writeToFile(path, name, weights, profits, disimilarCapacity)
-}
-
-func getProfitCeilingInstances(r int, n int, m int) {
-	instanceType := &mkp.ProfitCeilingInstances{}
-	weights, profits := instanceType.GenerateInstance(r, n, 3)
-	similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, m)
-	path, name := getFileName(r, n, m, instanceType.GetName(), normalBags[0].GetName())
-	writeToFile(path, name, weights, profits, similarCapacitis)
-
-	disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, m)
-	path, name = getFileName(r, n, m, instanceType.GetName(), normalBags[1].GetName())
-	writeToFile(path, name, weights, profits, disimilarCapacity)
-}
-
-func getCircleInstances(r int, n int, m int) {
-	instanceType := &mkp.CircleInstances{}
-	weights, profits := instanceType.GenerateInstance(r, n, 2.0 / 3.0)
-	similarCapacitis := normalBags[0].GenerateCapacity(weights, profits, m)
-	path, name := getFileName(r, n, m, instanceType.GetName(), normalBags[0].GetName())
-	writeToFile(path, name, weights, profits, similarCapacitis)
-
-	disimilarCapacity := normalBags[1].GenerateCapacity(weights, profits, m)
-	path, name = getFileName(r, n, m, instanceType.GetName(), normalBags[1].GetName())
-	writeToFile(path, name, weights, profits, disimilarCapacity)
-}
-
 
 func getFileName(r int, n int, m int, instanceType string, bagType string) (string, string) {
 	return fmt.Sprintf("%s/%s/", BASE_DIR, instanceType), fmt.Sprintf("%s_%d_%d_%d.txt", bagType, r, n, m)
