@@ -11,8 +11,8 @@ var normalInstances []mkp.InstanceType
 var difficultInstances = []string{"UncorrelatedSpannerInstances", "WeaklyCorrelatedSpannerInstances", "StronglyCorrelatedSpannerInstances",
 	"MultipleStronglyCorrelatedInstances", "ProfitCeilingInstances", "CircleInstances"}
 var normalBags      []mkp.BagType
-var R = []int{1000, 10000, 100000}
-var NMPair = [][]int{{50, 5}, {200, 20}}
+var R = []int{1000, 10000}
+var NMPair = [][]int{{2000, 200}, {2000, 400}, {2000, 800}, {4000, 200}, {4000, 400}, {4000, 800}, {8000, 200}, {8000, 400}, {8000, 800}}
 var BASE_DIR = "./generated_data/"
 
 func init() {

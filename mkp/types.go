@@ -173,7 +173,11 @@ func (wcsi *WeaklyCorrelatedSpannerInstances) GenerateInstance(r int, m int, v, 
 	tmpProfits := make([]float64, 0)
 	for i := 0; i < v; i++ {
 		tmpWeights = append(tmpWeights, float64(rnd.Intn(r) + 1) / float64(mt + 1))
-		tmpProfits = append(tmpProfits, float64(RandInt(int(math.Ceil(tmpWeights[i])) - (r / 10), int(math.Ceil(tmpWeights[i])) + (r / 10))) / float64(mt + 1))
+		t := float64(RandInt(int(math.Ceil(tmpWeights[i])) - (r / 10), int(math.Ceil(tmpWeights[i])) + (r / 10))) / float64(mt + 1)
+		if t < 0 {
+			t = -t
+		}
+		tmpProfits = append(tmpProfits, t)
 	}
 
 	choose := 0
@@ -204,7 +208,11 @@ func (wcsi *StronglyCorrelatedSpannerInstances) GenerateInstance(r int, m int, v
 	tmpProfits := make([]float64, 0)
 	for i := 0; i < v; i++ {
 		tmpWeights = append(tmpWeights, float64(rnd.Intn(r) + 1) / float64(mt + 1))
-		tmpProfits = append(tmpProfits, float64(weights[i] + (r / 10)) / float64(mt + 1))
+		t := float64(weights[i] + (r / 10)) / float64(mt + 1)
+		if t < 0 {
+			t = -t
+		}
+		tmpProfits = append(tmpProfits, t)
 	}
 
 	choose := 0
