@@ -317,7 +317,7 @@ func (dsb *DiSimilarBag) GenerateCapacity(weights []int, profits []int, n int) [
 		instanceWeights += weights[i]
 	}
 	for i := 0; i < n; i++ {
-		capacities = append(capacities, RandInt(0, instanceWeights / 4))
+		capacities = append(capacities, RandInt(0, instanceWeights / n * 2))
 		instanceWeights -= capacities[i]
 	}
 	return capacities
